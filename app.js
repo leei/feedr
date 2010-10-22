@@ -3,6 +3,7 @@
  * Module dependencies.
  */
 
+var sys = require('sys');
 var express = require('express');
 var connect = require('connect');
 var auth = require('connect-auth');
@@ -25,13 +26,6 @@ app.configure(function(){
   app.use(express.compiler({ src: __dirname + '/public', enable: ['less'] }));
   app.use(app.router);
   app.use(express.staticProvider(__dirname + '/public'));
-
-  //feedServer.register("http://cyber.law.harvard.edu/rss/examples/sampleRss091.xml");
-  //feedServer.register("http://cyber.law.harvard.edu/rss/examples/sampleRss092.xml");
-  //feedServer.register("http://cyber.law.harvard.edu/rss/examples/rss2sample.xml");
-  //feedServer.register("http://images.apple.com/main/rss/hotnews/hotnews.rss");
-  //feedServer.register("http://feeds.feedburner.com/salon/greenwald?format=xml");
-  feedServer.register("http://news.google.ca/news?pz=1&cf=all&ned=ca&hl=en&output=rss");
 });
 
 app.configure('development', function(){
@@ -50,6 +44,20 @@ app.get('/', function(req, res){
             title: 'Express'
         }
     });
+});
+
+// Initialize the feedServer
+feedServer.register("http://cyber.law.harvard.edu/rss/examples/sampleRss091.xml");
+feedServer.register("http://cyber.law.harvard.edu/rss/examples/sampleRss092.xml");
+feedServer.register("http://cyber.law.harvard.edu/rss/examples/rss2sample.xml");
+feedServer.register("http://images.apple.com/main/rss/hotnews/hotnews.rss");
+feedServer.register("http://feeds.feedburner.com/salon/greenwald?format=xml");
+feedServer.register("http://news.google.ca/news?pz=1&cf=all&ned=ca&hl=en&output=rss");
+
+// Actions for the feedServer...
+feedServer.onItem(function (item, feeds, newItem) {
+  sys.log("app: " + (newItem ? "NEW " : "UPD ") + sys.inspect(item.title || item.description));
+  sys.log("app: in feeds => " + sys.inspect(feeds));
 });
 
 // Only listen on $ node app.js
